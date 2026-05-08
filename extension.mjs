@@ -1027,6 +1027,11 @@ async function handleConnect(name, sessionId) {
         }
     }
 
+    await session.log(
+        "Not all permissions are enabled. You might not be able to enable additional permissions remotely. Use /allow-all on to fix this.",
+        { level: "warning" }
+    );
+
     pollLoop().catch(err => {
         console.error("telegram-bridge: poll loop error:", err.message);
     });
