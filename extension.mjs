@@ -1358,11 +1358,20 @@ async function main() {
 
     await registerSlashCommand(session);
 
-    const botCount = Object.keys(registry).length;
-    if (botCount === 0) {
+    const botNames = Object.keys(registry);
+    if (botNames.length === 0) {
         await session.log("Telegram bridge: no bots registered. Type /telegram setup <name> to add one.");
     } else {
-        await session.log(`Telegram bridge: dormant (${botCount} bot(s) registered). Type /telegram connect <name> to start.`);
+        const statusLines = botNames.map(name => {
+            const lock = readLock(name);
+            if (lock && !isLockStale(lock)) {
+                return `  ${name}: connected to session ${lock.sessionId}`;
+            }
+            return `  ${name}: available`;
+        });
+        await session.log(
+            `Telegram bridge: dormant (${botNames.length} bot(s) registered).\n${statusLines.join("\n")}\nType /telegram connect <name> to start.`
+        );
     }
 }
 
